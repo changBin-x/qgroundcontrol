@@ -1,10 +1,14 @@
-# Qt framework classes - must be preserved for JNI
+# Skydroid RCSDK uses callback and reflective SDK entry points.
+-keep class com.skydroid.** { *; }
+
 -keep class org.qtproject.qt.** { *; }
 -keep class org.kde.necessitas.** { *; }
 -keep class ru.dublgis.** { *; }
 -keep class com.falsinsoft.qtandroidtools.** { *; }
 
-# QGC classes with native methods
+# RCSDK bridge methods are registered and invoked from native code.
+-keep class org.mavlink.qgroundcontrol.QGCRCSDKBridge { *; }
+
 -keepclasseswithmembers class org.mavlink.qgroundcontrol.QGCActivity {
     native <methods>;
 }

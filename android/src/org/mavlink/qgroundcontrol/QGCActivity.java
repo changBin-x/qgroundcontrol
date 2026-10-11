@@ -36,6 +36,7 @@ public class QGCActivity extends QtActivity {
 
         QGCLogger.initialize(getApplicationContext());
         nativeInit();
+        QGCRCSDKManager.initialize(getApplicationContext());
         setupMulticastLock();
 
         QGCUsbSerialManager.initialize(this);
@@ -49,6 +50,7 @@ public class QGCActivity extends QtActivity {
             m_storagePermissionController.onPause();
         }
         QGCSDLManager.onPause();
+        QGCRCSDKManager.pause();
         super.onPause();
     }
 
@@ -56,6 +58,7 @@ public class QGCActivity extends QtActivity {
     protected void onResume() {
         super.onResume();
         QGCSDLManager.onResume();
+        QGCRCSDKManager.resume();
 
         if (m_storagePermissionController != null) {
             final Boolean granted = m_storagePermissionController.onResume();
@@ -68,6 +71,7 @@ public class QGCActivity extends QtActivity {
     @Override
     protected void onDestroy() {
         try {
+            QGCRCSDKManager.shutdownInstance();
             QGCSDLManager.cleanup();
             releaseMulticastLock();
             QGCUsbSerialManager.cleanup(this);
@@ -240,6 +244,11 @@ public class QGCActivity extends QtActivity {
             return false;
         }
         return displayName.toLowerCase(java.util.Locale.ROOT).endsWith(".plan");
+    }
+
+    static Context getApplicationContextForRCSDK() {
+        QGCActivity activity = m_instance;
+        return activity == null ? null : activity.getApplicationContext();
     }
 
     public static String getSDCardPath() {
