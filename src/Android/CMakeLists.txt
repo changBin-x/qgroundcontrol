@@ -21,12 +21,6 @@ target_sources(${CMAKE_PROJECT_NAME}
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-file(COPY
-    "${CMAKE_SOURCE_DIR}/android/src/org/mavlink/qgroundcontrol/QGCRCSDKBridge.java"
-    "${CMAKE_SOURCE_DIR}/android/src/org/mavlink/qgroundcontrol/QGCRCSDKManager.java"
-    DESTINATION "${QGC_ANDROID_EXTRA_JAVA_SOURCES_DIR}/org/mavlink/qgroundcontrol"
-)
-
 # ----------------------------------------------------------------------------
 # Android Serial Port Support
 # ----------------------------------------------------------------------------
