@@ -60,7 +60,7 @@ public class QGCRCSDKManagerTest {
         reader.awaitRequest();
         reader.request(0).onResult(null);
 
-        assertEquals(0, sink.channelCount.get());
+        assertEquals(1, sink.channelCount.getCount());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class QGCRCSDKManagerTest {
         manager.stop();
         reader.request(0).onResult(new int[] {1, 2, 3});
 
-        assertEquals(0, sink.channelCount.get());
+        assertEquals(1, sink.channelCount.getCount());
     }
 
     @Test
@@ -231,6 +231,31 @@ public class QGCRCSDKManagerTest {
         reader.awaitRequestCount(2);
 
         assertEquals(1, sink.channelCount.getCount());
+    }
+
+    @Test
+    public void pauseStopAndShutdownInvalidateNativeCallbacks() throws Exception {
+        FakeReader reader = new FakeReader();
+        RecordingSink sink = new RecordingSink();
+        QGCRCSDKManager manager = newManager(reader, sink);
+
+        manager.start();
+        reader.awaitConnectCount(1);
+        reader.connection(0).onRcConnected();
+        reader.awaitRequestCount(1);
+
+        manager.pausePolling();
+        assertEquals(1, sink.invalidateCount.get());
+
+        reader.request(0).onResult(new int[] {1, 2, 3});
+        manager.resumePolling();
+        reader.awaitRequestCount(2);
+
+        manager.stop();
+        assertEquals(2, sink.invalidateCount.get());
+
+        manager.shutdown();
+        assertEquals(3, sink.invalidateCount.get());
     }
 
     @Test
@@ -523,7 +548,7 @@ public class QGCRCSDKManagerTest {
         reader.awaitRequest();
         manager.pausePolling();
         reader.request(0).onResult(new int[] {1});
-        assertEquals(0, sink.channelCount.getCount());
+        assertEquals(1, sink.channelCount.getCount());
         manager.resumePolling();
         reader.awaitRequestCount(2);
         firstConnection.onRcDisconnect();
@@ -648,6 +673,10 @@ public class QGCRCSDKManagerTest {
         @Override
         public void onState(int state, String message, long generation) {
         }
+
+        @Override
+        public void invalidate() {
+        }
     }
 
     private static final class ThrowingSink implements QGCRCSDKBridge.NativeSink {
@@ -669,7 +698,10 @@ public class QGCRCSDKManagerTest {
         public void onChannels(int[] values, long generation) {
             channelCount.incrementAndGet();
             if (throwFromChannels) {
-                throw failure;
+                if (failure instanceof RuntimeException) {
+                    throw (RuntimeException) failure;
+                }
+                throw (Error) failure;
             }
         }
 
@@ -677,8 +709,15 @@ public class QGCRCSDKManagerTest {
         public void onState(int state, String message, long generation) {
             stateCount.incrementAndGet();
             if (!throwFromChannels) {
-                throw failure;
+                if (failure instanceof RuntimeException) {
+                    throw (RuntimeException) failure;
+                }
+                throw (Error) failure;
             }
+        }
+
+        @Override
+        public void invalidate() {
         }
     }
 
@@ -687,8 +726,10 @@ public class QGCRCSDKManagerTest {
         private final AtomicInteger connectedCount = new AtomicInteger();
         private final AtomicInteger disconnectedCount = new AtomicInteger();
         private final AtomicInteger errorCount = new AtomicInteger();
+        private final AtomicInteger invalidateCount = new AtomicInteger();
         private volatile int[] lastValues;
         private volatile long lastDisconnectedGeneration = Long.MIN_VALUE;
+
         @Override
         public void onChannels(int[] values, long generation) {
             lastValues = values;
@@ -705,6 +746,11 @@ public class QGCRCSDKManagerTest {
             } else if (state == QGCRCSDKBridge.STATE_ERROR) {
                 errorCount.incrementAndGet();
             }
+        }
+
+        @Override
+        public void invalidate() {
+            invalidateCount.incrementAndGet();
         }
     }
 }

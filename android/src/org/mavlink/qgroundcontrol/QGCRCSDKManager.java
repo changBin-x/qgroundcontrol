@@ -156,6 +156,7 @@ final class QGCRCSDKManager {
             cancelPollingLocked();
             cancelReconnectLocked();
         }
+        dispatchInvalidate();
     }
 
     synchronized void pausePolling() {
@@ -168,6 +169,7 @@ final class QGCRCSDKManager {
             cancelPollingLocked();
             cancelReconnectLocked();
         }
+        dispatchInvalidate();
     }
 
     synchronized void resumePolling() {
@@ -197,11 +199,20 @@ final class QGCRCSDKManager {
             cancelPollingLocked();
             cancelReconnectLocked();
         }
+        dispatchInvalidate();
         final long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(shutdownWaitMs);
         waitForRequestToFinish(deadline);
         disconnectWithoutBlocking(deadline);
         scheduler.shutdownNow();
         awaitScheduler(deadline);
+    }
+
+    private void dispatchInvalidate() {
+        try {
+            QGCRCSDKBridge.dispatchInvalidate(sink);
+        } catch (Throwable error) {
+            // Callback invalidation failure must not break manager lifecycle.
+        }
     }
 
     private void awaitScheduler(long deadline) {

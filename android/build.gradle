@@ -16,10 +16,29 @@ repositories {
     maven { url = 'https://jitpack.io' }
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+    localProperties.each { propName, propValue ->
+        if (!project.hasProperty(propName)) {
+            project.ext.set(propName, propValue)
+        }
+    }
+}
+
 apply plugin: qtGradlePluginType
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    if (project.hasProperty('qtJarDir')) {
+        implementation fileTree(dir: project.property('qtJarDir'), include: ['*.jar'])
+    } else if (project.hasProperty('qtAndroidDir')) {
+        def defaultJarDir = new File(project.property('qtAndroidDir').toString(), '../../../jar')
+        if (defaultJarDir.isDirectory() && !file('libs/Qt6Android.jar').exists()) {
+            implementation fileTree(dir: defaultJarDir, include: ['*.jar'])
+        }
+    }
     //noinspection GradleDependency
     implementation 'androidx.core:core:1.18.0'
     implementation 'com.github.mik3y:usb-serial-for-android:3.10.0'
@@ -117,6 +136,14 @@ android {
         targetSdkVersion qtTargetSdkVersion
         ndk.abiFilters = qtTargetAbiList.split(",")
 
+        // Standalone Gradle skips androiddeployqt placeholder substitution.
+        if (project.hasProperty('androidVersionCode')) {
+            versionCode Integer.parseInt(androidVersionCode.toString())
+        }
+        if (project.hasProperty('androidVersionName')) {
+            versionName androidVersionName.toString()
+        }
+
         println "applicationId: ${applicationId}"
         println "minSdk: ${minSdkVersion}"
         println "targetSdk: ${targetSdkVersion}"
@@ -149,5 +176,16 @@ android {
         exclude 'lib/*/*_Controls_Imagine_*'
         exclude 'lib/*/*_Controls_Material_*'
         exclude 'lib/*/*_Controls_Universal_*'
+    }
+}
+
+// Standalone Gradle skips androiddeployqt manifest placeholder substitution.
+tasks.matching { it.name.contains('Manifest') }.configureEach { task ->
+    task.doLast {
+        task.outputs.files.asFileTree.matching { include '**/*.xml' }.each { File f ->
+            if (f.isFile() && f.text.contains('-- %%INSERT_APP_ICON%% --')) {
+                f.text = f.text.replace('-- %%INSERT_APP_ICON%% --', '@drawable/icon')
+            }
+        }
     }
 }

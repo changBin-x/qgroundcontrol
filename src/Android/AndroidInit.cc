@@ -1,4 +1,5 @@
 #include "AndroidInterface.h"
+#include "AndroidRCSDK.h"
 #ifndef QGC_NO_SERIAL_LINK
 #include "AndroidSerial.h"
 #endif
@@ -157,6 +158,10 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     }
 
     AndroidInterface::setNativeMethods();
+    if (!AndroidRCSDKRegistration::setNativeMethods()) {
+        qCWarning(AndroidInitLog) << "RCSDK native method registration failed";
+        return JNI_ERR;
+    }
 
 #ifndef QGC_NO_SERIAL_LINK
     AndroidSerial::setNativeMethods();

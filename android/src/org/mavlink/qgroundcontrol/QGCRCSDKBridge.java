@@ -6,6 +6,9 @@ final class QGCRCSDKBridge {
         void onChannels(int[] values, long generation);
 
         void onState(int state, String message, long generation);
+
+        /** Drops queued C++ callbacks after Java pause/stop/shutdown. */
+        void invalidate();
     }
 
     static final int STATE_CONNECTED = 1;
@@ -21,6 +24,11 @@ final class QGCRCSDKBridge {
         @Override
         public void onState(int state, String message, long generation) {
             nativeState(state, message, generation);
+        }
+
+        @Override
+        public void invalidate() {
+            nativeInvalidateCallbacks();
         }
     };
 
@@ -43,7 +51,16 @@ final class QGCRCSDKBridge {
         }
     }
 
+    static void dispatchInvalidate(NativeSink sink) {
+        if (sink != null) {
+            sink.invalidate();
+        }
+    }
+
     static native void nativeChannels(int[] values, long generation);
 
     static native void nativeState(int state, String message, long generation);
+
+    /** Invalidates queued C++ callbacks after Java pause/stop/shutdown. */
+    static native void nativeInvalidateCallbacks();
 }
