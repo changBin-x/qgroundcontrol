@@ -8,11 +8,16 @@
 #include "SDLJoystick.h"
 #include "QGCLoggingCategory.h"
 
+#include "JoystickRCSDK.h"
+
 #ifdef Q_OS_ANDROID
 #include "AndroidEvents.h"
+#include "AndroidRCSDK.h"
 #endif
 
-using JoystickBackend = JoystickSDL;
+namespace {
+constexpr const char* kRCSDKJoystickName = "Skydroid G20 RCSDK";
+}
 
 #include <QtCore/QApplicationStatic>
 #include <QtCore/QSettings>
@@ -73,7 +78,14 @@ JoystickManager::~JoystickManager()
 
     // Cache contains the same joystick instances tracked in _name2JoystickMap.
     // We already deleted those above, so clear cache pointers only.
-    JoystickBackend::shutdown(false);
+    JoystickSDL::shutdown(false);
+
+#ifdef Q_OS_ANDROID
+    AndroidRCSDK* const rcsdk = AndroidRCSDK::instance();
+    if (rcsdk) {
+        rcsdk->stop();
+    }
+#endif
 
     qCDebug(JoystickManagerLog) << this;
 }
@@ -85,7 +97,7 @@ JoystickManager *JoystickManager::instance()
 
 void JoystickManager::init()
 {
-    if (!JoystickBackend::init()) {
+    if (!JoystickSDL::init()) {
         return;
     }
 
@@ -93,11 +105,40 @@ void JoystickManager::init()
     _updatePollingTimer();
 }
 
+bool JoystickManager::_isRCSDKAvailable() const
+{
+#ifdef Q_OS_ANDROID
+    return AndroidRCSDK::instance() && AndroidRCSDK::instance()->isAvailable();
+#elif defined(QGC_UNITTEST_BUILD)
+    return _mockRCSDKAvailable;
+#else
+    return false;
+#endif
+}
+
+QMap<QString, Joystick*> JoystickManager::_discoverJoysticks()
+{
+    QMap<QString, Joystick*> newMap = JoystickSDL::discover();
+
+    if (_isRCSDKAvailable()) {
+        const QString rcsdkName = QString::fromLatin1(kRCSDKJoystickName);
+        if (!newMap.contains(rcsdkName)) {
+            if (_name2JoystickMap.contains(rcsdkName) && qobject_cast<JoystickRCSDK*>(_name2JoystickMap[rcsdkName])) {
+                newMap.insert(rcsdkName, _name2JoystickMap[rcsdkName]);
+            } else {
+                newMap.insert(rcsdkName, new JoystickRCSDK(this));
+            }
+        }
+    }
+
+    return newMap;
+}
+
 void JoystickManager::_checkForAddedOrRemovedJoysticks()
 {
     qCDebug(JoystickManagerLog) << "Checking for added/removed joysticks, current count:" << _name2JoystickMap.size();
 
-    QMap<QString, Joystick*> newJoystickMap = JoystickBackend::discover();
+    QMap<QString, Joystick*> newJoystickMap = _discoverJoysticks();
 
     qCDebug(JoystickManagerLog) << "Discovery returned" << newJoystickMap.size() << "joysticks";
 
@@ -315,7 +356,7 @@ void JoystickManager::_handleSensorUpdate(int instanceId, int sensor, float x, f
 {
     Joystick *joystick = _findJoystickByInstanceId(instanceId);
     if (joystick) {
-        auto *sdlJoystick = qobject_cast<JoystickBackend*>(joystick);
+        auto *sdlJoystick = qobject_cast<JoystickSDL*>(joystick);
         const QVector3D data(x, y, z);
         // SDL_SENSOR_ACCEL = 1, SDL_SENSOR_GYRO = 2
         if (sensor == 1 || sensor == 4 || sensor == 6) {  // ACCEL, ACCEL_L, ACCEL_R
@@ -337,7 +378,7 @@ void JoystickManager::_handleSensorUpdate(int instanceId, int sensor, float x, f
 Joystick *JoystickManager::_findJoystickByInstanceId(int instanceId)
 {
     for (Joystick *joystick : _name2JoystickMap) {
-        if (auto *sdlJoystick = qobject_cast<JoystickBackend*>(joystick)) {
+        if (auto *sdlJoystick = qobject_cast<JoystickSDL*>(joystick)) {
             if (sdlJoystick->instanceId() == instanceId) {
                 return joystick;
             }

@@ -8,6 +8,7 @@
 
 #include "JoystickManager.h"
 #include "JoystickSDL.h"
+#include "JoystickRCSDK.h"
 #include "MockJoystick.h"
 #include "SDLJoystick.h"
 
@@ -438,6 +439,76 @@ void JoystickManagerTest::_joystickByNameTest()
 
     Joystick* missing = manager->joystickByName(QStringLiteral("Missing Controller"));
     QVERIFY(missing == nullptr);
+}
+
+void JoystickManagerTest::_rcsdkAggregationAndDistinctNamesTest()
+{
+    JoystickManager* manager = JoystickManager::instance();
+    const QString rcsdkName = QStringLiteral("Skydroid G20 RCSDK");
+
+    // 1. 默认情况下，未启用 RCSDK 桩，名称列表中不应包含 RCSDK
+    manager->setMockRCSDKAvailableForTest(false);
+    _refreshJoysticks(manager);
+    QVERIFY(!manager->availableJoystickNames().contains(rcsdkName));
+
+    // 2. 启用 RCSDK 发现后，RCSDK 出现在列表中且名称唯一
+    manager->setMockRCSDKAvailableForTest(true);
+    _refreshJoysticks(manager);
+
+    const QStringList namesWithRCSDK = manager->availableJoystickNames();
+    QVERIFY(namesWithRCSDK.contains(rcsdkName));
+    QCOMPARE(namesWithRCSDK.count(rcsdkName), 1);
+
+    Joystick* rcsdkJoystick = manager->joystickByName(rcsdkName);
+    QVERIFY(rcsdkJoystick != nullptr);
+    QCOMPARE(rcsdkJoystick->name(), rcsdkName);
+    QVERIFY(qobject_cast<JoystickRCSDK*>(rcsdkJoystick) != nullptr);
+
+    // 3. 同时插入模拟 SDL 手柄，两者共存且名称分立
+    _mockJoystick1 = std::unique_ptr<MockJoystick>(MockJoystick::create(QStringLiteral("Coexist SDL Controller"), 6, 16, 1));
+    QVERIFY(_mockJoystick1->isValid());
+    _refreshJoysticks(manager);
+
+    const QStringList coexistNames = manager->availableJoystickNames();
+    QVERIFY(coexistNames.contains(rcsdkName));
+    QVERIFY(coexistNames.contains(QStringLiteral("Coexist SDL Controller")));
+    QCOMPARE(coexistNames.count(rcsdkName), 1);
+
+    _mockJoystick1.reset();
+
+    // 4. 关闭 RCSDK，设备被干净移除
+    manager->setMockRCSDKAvailableForTest(false);
+    _refreshJoysticks(manager);
+    QVERIFY(!manager->availableJoystickNames().contains(rcsdkName));
+}
+
+void JoystickManagerTest::_rcsdkLifecycleAndReuseTest()
+{
+    JoystickManager* manager = JoystickManager::instance();
+    const QString rcsdkName = QStringLiteral("Skydroid G20 RCSDK");
+
+    manager->setMockRCSDKAvailableForTest(true);
+    _refreshJoysticks(manager);
+
+    Joystick* firstInstance = manager->joystickByName(rcsdkName);
+    QVERIFY(firstInstance != nullptr);
+
+    // 重复刷新发现，验证对象被复用（地址指针一致），不重复创建
+    _refreshJoysticks(manager);
+    Joystick* secondInstance = manager->joystickByName(rcsdkName);
+    QCOMPARE(secondInstance, firstInstance);
+
+    // 激活该摇杆
+    manager->_setActiveJoystickByName(rcsdkName);
+    QCOMPARE(manager->activeJoystick(), firstInstance);
+
+    // 模拟 RCSDK 设备离线
+    manager->setMockRCSDKAvailableForTest(false);
+    _refreshJoysticks(manager);
+
+    // 激活的摇杆应安全置空，避免悬空指针
+    QVERIFY(manager->activeJoystick() == nullptr);
+    QVERIFY(manager->joystickByName(rcsdkName) == nullptr);
 }
 
 UT_REGISTER_TEST(JoystickManagerTest, TestLabel::Unit, TestLabel::Joystick)

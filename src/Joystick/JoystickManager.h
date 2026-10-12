@@ -50,6 +50,10 @@ public:
     /// Get joystick by name (returns nullptr if not found)
     Q_INVOKABLE Joystick *joystickByName(const QString &name) const;
 
+#ifdef QGC_UNITTEST_BUILD
+    void setMockRCSDKAvailableForTest(bool available) { _mockRCSDKAvailable = available; }
+#endif
+
 signals:
     void activeJoystickChanged(Joystick *joystick);
     void activeJoystickEnabledForActiveVehicleChanged();
@@ -78,6 +82,12 @@ private:
     void _setJoystickEnabledForVehicle(Vehicle *vehicle, bool enabled);
     Joystick *_findJoystickByInstanceId(int instanceId);
     void _updatePollingTimer();
+    QMap<QString, Joystick*> _discoverJoysticks();
+    bool _isRCSDKAvailable() const;
+
+#ifdef QGC_UNITTEST_BUILD
+    bool _mockRCSDKAvailable = false;
+#endif
 
     JoystickManagerSettings *_joystickManagerSettings = nullptr;
     Joystick *_activeJoystick = nullptr;

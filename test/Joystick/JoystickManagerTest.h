@@ -42,6 +42,10 @@ private slots:
     void _linkedGroupMembersTest();
     void _joystickByNameTest();
 
+    // RCSDK aggregation tests
+    void _rcsdkAggregationAndDistinctNamesTest();
+    void _rcsdkLifecycleAndReuseTest();
+
 private:
     void _refreshJoysticks(JoystickManager* manager);
     bool _waitForJoystickNames(JoystickManager* manager, const QStringList& expectedNames,
