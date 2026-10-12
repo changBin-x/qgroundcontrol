@@ -52,6 +52,9 @@ void RCSDKChannelMapper::replaceSnapshot(const QVector<int>& values, qint64 time
         if (observed != state.candidateValue) {
             state.candidateValue = observed;
             state.candidateSinceMs = timestampMs;
+            if (binding.debounceMs <= 0) {
+                state.stableValue = observed;
+            }
         } else {
             if (state.candidateSinceMs == 0) {
                 state.candidateSinceMs = timestampMs;
@@ -153,10 +156,26 @@ void RCSDKChannelMapper::setAxisBinding(int logicalAxis, const AxisBinding& bind
     }
 }
 
+RCSDKChannelMapper::AxisBinding RCSDKChannelMapper::axisBinding(int logicalAxis) const
+{
+    if (logicalAxis >= 0 && logicalAxis < MaxLogicalAxes) {
+        return _axisBindings[static_cast<size_t>(logicalAxis)];
+    }
+    return {};
+}
+
 void RCSDKChannelMapper::setButtonBinding(int logicalButton, const ButtonBinding& binding)
 {
     if (logicalButton >= 0 && logicalButton < MaxLogicalButtons) {
         _buttonBindings[static_cast<size_t>(logicalButton)] = binding;
         _buttonStates[static_cast<size_t>(logicalButton)] = {};
     }
+}
+
+RCSDKChannelMapper::ButtonBinding RCSDKChannelMapper::buttonBinding(int logicalButton) const
+{
+    if (logicalButton >= 0 && logicalButton < MaxLogicalButtons) {
+        return _buttonBindings[static_cast<size_t>(logicalButton)];
+    }
+    return {};
 }

@@ -78,8 +78,14 @@ public:
     /// 配置指定逻辑轴的绑定参数
     void setAxisBinding(int logicalAxis, const AxisBinding& binding);
 
+    /// 获取指定逻辑轴的绑定参数
+    AxisBinding axisBinding(int logicalAxis) const;
+
     /// 配置指定逻辑按钮的绑定参数
     void setButtonBinding(int logicalButton, const ButtonBinding& binding);
+
+    /// 获取指定逻辑按钮的绑定参数
+    ButtonBinding buttonBinding(int logicalButton) const;
 
     /// 设置快照超时时间阈值（毫秒）
     void setTimeoutMs(qint64 timeoutMs) { _timeoutMs = timeoutMs; }
