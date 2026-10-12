@@ -183,6 +183,87 @@ void RCSDKChannelMapperTest::_buttonDebounceAndFailure_test()
     QVERIFY(!mapper.buttonValue(0, 1270)); // 长度变短，直接安全失效
 }
 
+void RCSDKChannelMapperTest::_configurationRawValuesFixture_test()
+{
+    RCSDKChannelMapper mapper;
+    const qint64 now = 1000;
+    const QVector<int> sample{
+        1500, 1500, 1500, 1500, 1950, 1050, 1050, 1950,
+        1050, 1050, 1050, 1050, 1050, 1500, 1050, 1050,
+    };
+    mapper.replaceSnapshot(sample, now, 1);
+    QCOMPARE(mapper.rawValues(), sample);
+    QCOMPARE(mapper.rawValues().size(), 16);
+
+    // 验证动态选择 channel 4（1950）绑定到逻辑轴 0
+    RCSDKChannelMapper::AxisBinding axis0;
+    axis0.channel = 4;
+    axis0.minimum = 1050;
+    axis0.center = 1500;
+    axis0.maximum = 1950;
+    mapper.setAxisBinding(0, axis0);
+    QCOMPARE(mapper.axisValue(0, now), static_cast<int>(RCSDKChannelMapper::AxisMax));
+}
+
+void RCSDKChannelMapperTest::_multiPositionSwitchAndPulse_test()
+{
+    RCSDKChannelMapper mapper;
+    qint64 t = 1000;
+
+    // 多段开关：例如 3 段开关在通道 6，位置 1 = 1000, 位置 2 = 1500, 位置 3 = 2000
+    // 分别映射为 3 个逻辑按钮（Button 0, Button 1, Button 2）
+    RCSDKChannelMapper::ButtonBinding pos1{6, 1000, 0, 50, 30};
+    RCSDKChannelMapper::ButtonBinding pos2{6, 1500, 0, 50, 30};
+    RCSDKChannelMapper::ButtonBinding pos3{6, 2000, 0, 50, 30};
+    mapper.setButtonBinding(0, pos1);
+    mapper.setButtonBinding(1, pos2);
+    mapper.setButtonBinding(2, pos3);
+
+    // 位置 1 (1000)
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 1000}, t, 1);
+    t += 50;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 1000}, t, 2);
+    QVERIFY(mapper.buttonValue(0, t));
+    QVERIFY(!mapper.buttonValue(1, t));
+    QVERIFY(!mapper.buttonValue(2, t));
+
+    // 切换到位置 2 (1500)
+    t += 10;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 1500}, t, 3);
+    t += 50;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 1500}, t, 4);
+    QVERIFY(!mapper.buttonValue(0, t));
+    QVERIFY(mapper.buttonValue(1, t));
+    QVERIFY(!mapper.buttonValue(2, t));
+
+    // 切换到位置 3 (2000)
+    t += 10;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 2000}, t, 5);
+    t += 50;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 2000}, t, 6);
+    QVERIFY(!mapper.buttonValue(0, t));
+    QVERIFY(!mapper.buttonValue(1, t));
+    QVERIFY(mapper.buttonValue(2, t));
+
+    // 脉冲按钮去抖测试（channel 7 脉冲按键，平时 1000，瞬时按下 2000，回弹 1000）
+    RCSDKChannelMapper::ButtonBinding pulseBtn{7, 2000, 1000, 50, 40};
+    mapper.setButtonBinding(3, pulseBtn);
+
+    // 脉冲未达去抖时间（持续 20ms < 40ms），不误触发
+    t += 10;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 2000, 2000}, t, 7);
+    t += 20;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 2000, 1000}, t, 8);
+    QVERIFY(!mapper.buttonValue(3, t));
+
+    // 脉冲持续有效（持续 50ms >= 40ms），确认触发
+    t += 10;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 2000, 2000}, t, 9);
+    t += 50;
+    mapper.replaceSnapshot({1500, 1500, 1500, 1500, 1500, 1500, 2000, 2000}, t, 10);
+    QVERIFY(mapper.buttonValue(3, t));
+}
+
 #ifdef QGC_UNITTEST_BUILD
 UT_REGISTER_TEST_LIGHTWEIGHT(RCSDKChannelMapperTest, TestLabel::Unit, TestLabel::Joystick)
 #endif

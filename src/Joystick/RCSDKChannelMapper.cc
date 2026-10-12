@@ -43,7 +43,9 @@ void RCSDKChannelMapper::replaceSnapshot(const QVector<int>& values, qint64 time
         bool observed = false;
         if (distPressed <= binding.threshold) {
             observed = true;
-        } else if (distReleased <= binding.threshold) {
+        } else if (binding.releasedValue > 0 && distReleased <= binding.threshold) {
+            observed = false;
+        } else if (binding.releasedValue <= 0) {
             observed = false;
         } else {
             continue;

@@ -22,4 +22,6 @@ private slots:
     void _axisBoundaryAndReversed_test();
     void _snapshotLifecycleAndTimeout_test();
     void _buttonDebounceAndFailure_test();
+    void _configurationRawValuesFixture_test();
+    void _multiPositionSwitchAndPulse_test();
 };
