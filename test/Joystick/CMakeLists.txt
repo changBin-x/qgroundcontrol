@@ -13,6 +13,8 @@ target_sources(${CMAKE_PROJECT_NAME}
         MockJoystick.h
         MockJoystickTest.cc
         MockJoystickTest.h
+        RCSDKChannelMapperTest.cc
+        RCSDKChannelMapperTest.h
         SDLTest.cc
         SDLTest.h
 )
@@ -22,4 +24,5 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_
 add_qgc_test(JoystickTest LABELS Unit Joystick RESOURCE_LOCK Joystick)
 add_qgc_test(JoystickManagerTest LABELS Unit Joystick RESOURCE_LOCK Joystick TIMEOUT ${QGC_TEST_TIMEOUT_EXTENDED})
 add_qgc_test(MockJoystickTest LABELS Unit Joystick RESOURCE_LOCK Joystick)
+add_qgc_test(RCSDKChannelMapperTest LABELS Unit Joystick)
 add_qgc_test(SDLTest LABELS Unit Joystick RESOURCE_LOCK Joystick)
