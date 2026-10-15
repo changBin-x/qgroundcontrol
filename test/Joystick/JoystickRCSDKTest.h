@@ -19,6 +19,7 @@ class JoystickRCSDKTest : public QObject
 private slots:
     void _invalidSnapshotCentersInputs_test();
     void _deviceIdentity_test();
+    void _defaultPassthroughBindings_test();
     void _snapshotDeliveryAndMapping_test();
     void _qsettingsLoadSave_test();
     void _timeoutSafelyCenters_test();

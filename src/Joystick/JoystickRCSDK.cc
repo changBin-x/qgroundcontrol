@@ -8,8 +8,8 @@
 #include "JoystickRCSDK.h"
 
 #include <QtCore/QDateTime>
-#include <QtCore/QSettings>
 #include <QtCore/QLoggingCategory>
+#include <QtCore/QSettings>
 
 #ifdef Q_OS_ANDROID
 #include "AndroidRCSDK.h"
@@ -21,6 +21,13 @@ QGC_LOGGING_CATEGORY(JoystickRCSDKLog, "Joystick.JoystickRCSDK")
 
 namespace {
 constexpr const char* kDefaultSettingsGroup = "JoystickSettingsV2/Skydroid G20 RCSDK";
+constexpr int kDefaultPwmMinimum = 1000;
+constexpr int kDefaultPwmCenter = 1500;
+constexpr int kDefaultPwmMaximum = 2000;
+constexpr int kDefaultButtonPressedPwm = 1950;
+constexpr int kDefaultButtonReleasedPwm = 1050;
+constexpr int kDefaultButtonThreshold = 200;
+constexpr int kDefaultButtonBaseChannel = 4;
 }
 
 JoystickRCSDK::JoystickRCSDK(QObject *parent)
@@ -31,6 +38,7 @@ JoystickRCSDK::JoystickRCSDK(QObject *parent)
                parent)
     , _settingsGroupPrefix(QString::fromLatin1(kDefaultSettingsGroup))
 {
+    _mapper.replaceSnapshot(QVector<int>(16, 1500), QDateTime::currentMSecsSinceEpoch(), 0);
     loadSettings();
 }
 
@@ -45,29 +53,48 @@ void JoystickRCSDK::loadSettings()
     settings.sync();
     settings.beginGroup(_settingsGroupPrefix);
 
-    // 逻辑轴配置
+    // 逻辑轴配置。未写入 settings 时 channel 默认为 -1，会导致 _getAxisValue 恒为 0，
+    // Joystick 配置页指示器完全不动。缺省改为 axis i → RCSDK channel i 透传，交给 QGC 校准。
     for (int i = 0; i < RCSDKChannelMapper::MaxLogicalAxes; ++i) {
         settings.beginGroup(QStringLiteral("Axis_%1").arg(i));
         RCSDKChannelMapper::AxisBinding binding;
         binding.channel = settings.value(QStringLiteral("channel"), -1).toInt();
-        binding.minimum = settings.value(QStringLiteral("minimum"), 1000).toInt();
-        binding.center  = settings.value(QStringLiteral("center"),  1500).toInt();
-        binding.maximum = settings.value(QStringLiteral("maximum"), 2000).toInt();
+        binding.minimum = settings.value(QStringLiteral("minimum"), kDefaultPwmMinimum).toInt();
+        binding.center  = settings.value(QStringLiteral("center"),  kDefaultPwmCenter).toInt();
+        binding.maximum = settings.value(QStringLiteral("maximum"), kDefaultPwmMaximum).toInt();
         binding.reversed= settings.value(QStringLiteral("reversed"), false).toBool();
         settings.endGroup();
+        if (binding.channel < 0) {
+            binding.channel = i;
+            binding.minimum = kDefaultPwmMinimum;
+            binding.center = kDefaultPwmCenter;
+            binding.maximum = kDefaultPwmMaximum;
+            binding.reversed = false;
+        }
         _mapper.setAxisBinding(i, binding);
     }
 
-    // 逻辑按钮配置
+    // 逻辑按钮配置。G20 KeyChannels 样本中 CH0-3 为摇杆中位 1500，CH4+ 多为 1050/1950 开关量。
+    // 缺省从 channel 4 起映射按钮，避免与摇杆轴抢同一通道的去抖状态。
     for (int i = 0; i < RCSDKChannelMapper::MaxLogicalButtons; ++i) {
         settings.beginGroup(QStringLiteral("Button_%1").arg(i));
         RCSDKChannelMapper::ButtonBinding binding;
         binding.channel       = settings.value(QStringLiteral("channel"), -1).toInt();
-        binding.pressedValue  = settings.value(QStringLiteral("pressedValue"), 2000).toInt();
-        binding.releasedValue = settings.value(QStringLiteral("releasedValue"), 1000).toInt();
-        binding.threshold     = settings.value(QStringLiteral("threshold"), 50).toInt();
+        binding.pressedValue  = settings.value(QStringLiteral("pressedValue"), kDefaultButtonPressedPwm).toInt();
+        binding.releasedValue = settings.value(QStringLiteral("releasedValue"), kDefaultButtonReleasedPwm).toInt();
+        binding.threshold     = settings.value(QStringLiteral("threshold"), kDefaultButtonThreshold).toInt();
         binding.debounceMs    = settings.value(QStringLiteral("debounceMs"), 50).toLongLong();
         settings.endGroup();
+        if (binding.channel < 0) {
+            const int defaultChannel = kDefaultButtonBaseChannel + i;
+            if (defaultChannel < RCSDKChannelMapper::MaxChannels) {
+                binding.channel = defaultChannel;
+                binding.pressedValue = kDefaultButtonPressedPwm;
+                binding.releasedValue = kDefaultButtonReleasedPwm;
+                binding.threshold = kDefaultButtonThreshold;
+                binding.debounceMs = 50;
+            }
+        }
         _mapper.setButtonBinding(i, binding);
     }
 
@@ -167,18 +194,22 @@ void JoystickRCSDK::setSettingsGroupPrefixForTest(const QString& prefix)
 
 bool JoystickRCSDK::_open()
 {
+    qCDebug(JoystickRCSDKLog) << "JoystickRCSDK::_open() called";
 #ifdef Q_OS_ANDROID
     AndroidRCSDK* const rcsdk = AndroidRCSDK::instance();
     if (rcsdk && rcsdk->isAvailable()) {
         connect(rcsdk, &AndroidRCSDK::snapshotReady, this, &JoystickRCSDK::_onSnapshotReady, Qt::UniqueConnection);
         if (!rcsdk->start()) {
-            qCWarning(JoystickRCSDKLog) << "Failed to start AndroidRCSDK adapter";
-            return false;
+            // 启动失败不应让整个摇杆失效：AndroidRCSDK::start() 内部会自愈（startInstance 在实例缺失时
+            // 重新 initialize）。保留轮询线程运行，等真实快照到达后再替换占位快照，避免出现“0 轴”死锁。
+            qCWarning(JoystickRCSDKLog) << "AndroidRCSDK adapter start failed, keeping polling thread alive";
         }
     }
 #endif
 
+    _mapper.replaceSnapshot(QVector<int>(16, 1500), QDateTime::currentMSecsSinceEpoch(), 0);
     loadSettings();
+
     return true;
 }
 
@@ -216,10 +247,8 @@ bool JoystickRCSDK::_update()
         }
     }
 
-    const QVector<int> raw = _mapper.rawValues();
-    if (!raw.isEmpty()) {
-        emit rawChannelValuesChanged(raw);
-    }
+    // 不在此处 emit rawChannelValuesChanged：配置页由 Joystick::_handleAxis() 用 _getAxisValue()
+    // 统一发出。若这里再发原始 PWM 数组，会被随后的轴值覆盖，且长度/量纲与 Joystick 配置 UI 不一致。
 
     return true;
 }

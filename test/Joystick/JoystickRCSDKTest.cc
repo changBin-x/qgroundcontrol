@@ -20,6 +20,41 @@ void JoystickRCSDKTest::_deviceIdentity_test()
     QCOMPARE(joystick.guid(), QStringLiteral("Skydroid_G20_RCSDK"));
 }
 
+void JoystickRCSDKTest::_defaultPassthroughBindings_test()
+{
+    JoystickRCSDK joystick;
+    joystick.setSettingsGroupPrefixForTest(
+        QStringLiteral("JoystickRCSDKTest/DefaultPassthrough_%1").arg(QDateTime::currentMSecsSinceEpoch()));
+    joystick.loadSettings();
+
+    for (int axis = 0; axis < RCSDKChannelMapper::MaxLogicalAxes; ++axis) {
+        const auto binding = joystick.axisBinding(axis);
+        QCOMPARE(binding.channel, axis);
+        QCOMPARE(binding.minimum, 1000);
+        QCOMPARE(binding.center, 1500);
+        QCOMPARE(binding.maximum, 2000);
+    }
+
+    for (int button = 0; button < 8; ++button) {
+        const auto binding = joystick.buttonBinding(button);
+        QCOMPARE(binding.channel, 4 + button);
+        QCOMPARE(binding.pressedValue, 1950);
+        QCOMPARE(binding.releasedValue, 1050);
+    }
+
+    QVector<int> values(16, 1500);
+    values[0] = 2000;
+    values[4] = 1950;
+    const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
+    joystick.setSnapshotForTest(values, t0, 1);
+    QVERIFY(joystick.updateForTest());
+    QVERIFY(joystick.axisValueForTest(0) > 0);
+    // 默认按钮去抖 50ms：同一时刻首帧只建立 candidate，需第二帧才稳定为按下。
+    joystick.setSnapshotForTest(values, t0 + 50, 2);
+    QVERIFY(joystick.updateForTest());
+    QVERIFY(joystick.buttonValueForTest(0));
+}
+
 void JoystickRCSDKTest::_invalidSnapshotCentersInputs_test()
 {
     JoystickRCSDK joystick;
