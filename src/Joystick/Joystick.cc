@@ -770,7 +770,10 @@ void Joystick::_handleButtons()
                 emit rawButtonPressedChanged(buttonIndex, false);
             }
         }
-    } else if (_pollingFlags.testFlag(PollingForVehicle)) {
+    }
+
+    // Keep vehicle button actions alive while Joystick config page is open (same H9 starve as axes).
+    if (_pollingFlags.testFlag(PollingForVehicle)) {
         Vehicle *const vehicle = _pollingVehicle;
         if (!vehicle) {
             qCWarning(JoystickLog) << "Internal Error: No vehicle for joystick!";
@@ -954,7 +957,12 @@ void Joystick::_handleAxis()
             channelValues[axisIndex] = _getAxisValue(axisIndex);
         }
         emit rawChannelValuesChanged(channelValues);
-    } else if (_pollingFlags.testFlag(PollingForVehicle)) {
+    }
+
+    // Vehicle MANUAL_CONTROL must keep running even when the Joystick config page is open
+    // (PollingForConfiguration | PollingForVehicle). Previously an else-if starved TX while
+    // viewing/calibrating.
+    if (_pollingFlags.testFlag(PollingForVehicle)) {
         Vehicle *const vehicle = _pollingVehicle;
         if (!vehicle) {
             qCWarning(JoystickLog) << "Internal Error: No vehicle for joystick!";
@@ -1182,7 +1190,6 @@ void Joystick::_handleAxis()
 
         const uint16_t lowButtons = static_cast<uint16_t>(buttonPressedBits & 0xFFFF);
         const uint16_t highButtons = static_cast<uint16_t>((buttonPressedBits >> 16) & 0xFFFF);
-
 
         vehicle->sendJoystickDataThreadSafe(roll, pitch, yaw, throttle, lowButtons, highButtons, pitchExtension, rollExtension, auxManualControl1, auxManualControl2, auxManualControl3, auxManualControl4, auxManualControl5, auxManualControl6);
         vehicle->sendJoystickAuxRcOverrideThreadSafe(auxRcOverridePwm, auxRcOverrideEnabled, !additionalAxesFunctionIsManualControl);
