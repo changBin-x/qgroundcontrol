@@ -173,11 +173,13 @@ AndroidRCSDK* AndroidRCSDK::instance()
     }
 
     QCoreApplication* const application = QCoreApplication::instance();
-    if (!application || QThread::currentThread() != application->thread()) {
+    if (!application) {
         return nullptr;
     }
 
-    AndroidRCSDK* const createdAdapter = new AndroidRCSDK(application);
+    AndroidRCSDK* const createdAdapter = new AndroidRCSDK();
+    createdAdapter->moveToThread(application->thread());
+    createdAdapter->setParent(application);
     AndroidRCSDK* expectedAdapter = nullptr;
     if (adapter.compare_exchange_strong(
             expectedAdapter, createdAdapter, std::memory_order_release, std::memory_order_acquire)) {
@@ -190,16 +192,12 @@ AndroidRCSDK* AndroidRCSDK::instance()
 
 bool AndroidRCSDK::start()
 {
-    if (QThread::currentThread() != thread()) {
-        return false;
-    }
-
     invalidateNativeCallbacks();
     if (!isAvailable()) {
         return false;
     }
 
-    QJniObject::callStaticMethod<void>(kManagerClassName, "resume", "()V");
+    QJniObject::callStaticMethod<void>(kManagerClassName, "startInstance", "()V");
     QJniEnvironment env;
     if (env.checkAndClearExceptions()) {
         qCWarning(AndroidRCSDKLog) << "Unable to start the RCSDK manager";
@@ -210,16 +208,12 @@ bool AndroidRCSDK::start()
 
 void AndroidRCSDK::stop()
 {
-    if (QThread::currentThread() != thread()) {
-        return;
-    }
-
     invalidateNativeCallbacks();
     if (!isAvailable()) {
         return;
     }
 
-    QJniObject::callStaticMethod<void>(kManagerClassName, "shutdownInstance", "()V");
+    QJniObject::callStaticMethod<void>(kManagerClassName, "pause", "()V");
     QJniEnvironment env;
     if (env.checkAndClearExceptions()) {
         qCWarning(AndroidRCSDKLog) << "Unable to stop the RCSDK manager";

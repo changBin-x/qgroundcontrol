@@ -1,6 +1,7 @@
 package org.mavlink.qgroundcontrol;
 
 import android.content.Context;
+import android.util.Log;
 import com.skydroid.rcsdk.KeyManager;
 import com.skydroid.rcsdk.RCSDKManager;
 import com.skydroid.rcsdk.SDKManagerCallBack;
@@ -17,6 +18,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /** Owns the RCSDK lifecycle and the single G-series channel polling loop. */
 final class QGCRCSDKManager {
+    private static final String TAG = "QGCRCSDKManager";
+
     interface KeyChannelsCallback {
         void onResult(int[] values);
 
@@ -69,6 +72,7 @@ final class QGCRCSDKManager {
 
     static void initialize(Context context) {
         synchronized (QGCRCSDKManager.class) {
+            Log.i(TAG, "initialize() called with context=" + context);
             if (instance == null) {
                 instance = new QGCRCSDKManager(new ProductionReader(context),
                         QGCRCSDKBridge.nativeSink(), POLL_INTERVAL_MS, () ->
@@ -78,8 +82,25 @@ final class QGCRCSDKManager {
         }
     }
 
+    static void startInstance() {
+        synchronized (QGCRCSDKManager.class) {
+            Log.i(TAG, "startInstance() called, instance=" + instance);
+            if (instance == null) {
+                Context ctx = QGCActivity.getApplicationContextForRCSDK();
+                if (ctx != null) {
+                    initialize(ctx);
+                }
+            }
+            if (instance != null) {
+                instance.start();
+                instance.resumePolling();
+            }
+        }
+    }
+
     static void pause() {
         synchronized (QGCRCSDKManager.class) {
+            Log.i(TAG, "pause() called");
             if (instance != null) {
                 instance.pausePolling();
             }
@@ -88,6 +109,7 @@ final class QGCRCSDKManager {
 
     static void resume() {
         synchronized (QGCRCSDKManager.class) {
+            Log.i(TAG, "resume() called");
             if (instance != null) {
                 instance.resumePolling();
             }
@@ -96,6 +118,7 @@ final class QGCRCSDKManager {
 
     static void shutdownInstance() {
         synchronized (QGCRCSDKManager.class) {
+            Log.i(TAG, "shutdownInstance() called");
             if (instance != null) {
                 instance.shutdown();
                 instance = null;
@@ -504,6 +527,7 @@ final class QGCRCSDKManager {
 
         @Override
         public void connect(ConnectionCallback callback) {
+            Log.i(TAG, "ProductionReader.connect() context=" + context);
             if (context == null) {
                 callback.onRcConnectFail(new IllegalArgumentException("RCSDK context is null"));
                 return;
@@ -511,16 +535,19 @@ final class QGCRCSDKManager {
             RCSDKManager.INSTANCE.initSDK(context, new SDKManagerCallBack() {
                 @Override
                 public void onRcConnected() {
+                    Log.i(TAG, "RCSDKManager onRcConnected()");
                     callback.onRcConnected();
                 }
 
                 @Override
                 public void onRcConnectFail(SkyException error) {
+                    Log.w(TAG, "RCSDKManager onRcConnectFail(): " + error);
                     callback.onRcConnectFail(error);
                 }
 
                 @Override
                 public void onRcDisconnect() {
+                    Log.w(TAG, "RCSDKManager onRcDisconnect()");
                     callback.onRcDisconnect();
                 }
             });
@@ -539,6 +566,7 @@ final class QGCRCSDKManager {
 
                         @Override
                         public void onFailure(SkyException error) {
+                            Log.w(TAG, "KeyManager get(KeyChannels) failed: " + error);
                             callback.onError(error);
                         }
                     });
