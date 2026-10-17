@@ -6,7 +6,7 @@
             "name": "mapProvider",
             "shortDesc": "Currently selected map provider for flight maps",
             "type": "string",
-            "default": "Bing",
+            "default": "Gaode",
             "label": "Currently selected map provider for flight maps",
             "keywords": "3d map"
         },

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QByteArray>
 #include <QtCore/QPointer>
 #include <QtLocation/private/qgeotiledmapreply_p.h>
 #include <QtNetwork/QNetworkReply>
@@ -33,11 +34,18 @@ private slots:
 
 private:
     static void _initDataFromResources();
+    static QByteArray _compositeOverlay(const QByteArray &baseImage, const QByteArray &overlayImage);
+    void _finishWithImage(const QByteArray &image, const QString &providerName);
+    void _startOverlayFetch(const QUrl &overlayUrl);
 
     QPointer<QNetworkAccessManager> _networkManager;
     QPointer<QNetworkReply> _networkReply;
     QNetworkRequest _request;
     bool m_initialized = false;
+
+    /// Base satellite bytes while waiting for road/label overlay (Gaode Hybrid).
+    QByteArray _pendingBaseImage;
+    bool _fetchingOverlay = false;
 
     static QByteArray _bingNoTileImage;
     static QByteArray _badTile;

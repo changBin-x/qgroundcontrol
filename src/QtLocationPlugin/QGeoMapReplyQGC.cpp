@@ -1,6 +1,9 @@
 #include "QGeoMapReplyQGC.h"
 
+#include <QtCore/QBuffer>
 #include <QtCore/QFile>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 #include <QtLocation/private/qgeotilespec_p.h>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QSslError>
@@ -14,6 +17,7 @@
 #include "QGCMapUrlEngine.h"
 #include "QGCNetworkHelper.h"
 #include "QGeoFileTileCacheQGC.h"
+#include "QGeoTileFetcherQGC.h"
 
 QGC_LOGGING_CATEGORY(QGeoTiledMapReplyQGCLog, "QtLocationPlugin.QGeoTiledMapReplyQGC")
 
@@ -92,6 +96,80 @@ void QGeoTiledMapReplyQGC::_initDataFromResources()
     }
 }
 
+QByteArray QGeoTiledMapReplyQGC::_compositeOverlay(const QByteArray &baseImage, const QByteArray &overlayImage)
+{
+    QImage base;
+    QImage overlay;
+    if (!base.loadFromData(baseImage) || !overlay.loadFromData(overlayImage)) {
+        return baseImage;
+    }
+
+    base = base.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    overlay = overlay.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    if (overlay.size() != base.size()) {
+        overlay = overlay.scaled(base.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    }
+
+    QPainter painter(&base);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.drawImage(0, 0, overlay);
+    painter.end();
+
+    QByteArray out;
+    QBuffer buffer(&out);
+    if (!buffer.open(QIODevice::WriteOnly) || !base.save(&buffer, "PNG")) {
+        return baseImage;
+    }
+    return out;
+}
+
+void QGeoTiledMapReplyQGC::_finishWithImage(const QByteArray &image, const QString &providerName)
+{
+    setMapImageData(image);
+
+    const SharedMapProvider mapProvider = UrlFactory::getMapProviderFromProviderType(providerName);
+    const QString format = mapProvider ? mapProvider->getImageFormat(image) : QStringLiteral("png");
+    if (format.isEmpty()) {
+        setError(QGeoTiledMapReply::ParseError, tr("Unknown Format"));
+        return;
+    }
+    setMapImageFormat(format);
+
+    QGeoFileTileCacheQGC::cacheTile(providerName, tileSpec().x(), tileSpec().y(), tileSpec().zoom(), image, format);
+    setFinished(true);
+}
+
+void QGeoTiledMapReplyQGC::_startOverlayFetch(const QUrl &overlayUrl)
+{
+    if (!_networkManager || !overlayUrl.isValid()) {
+        _finishWithImage(_pendingBaseImage, UrlFactory::getProviderTypeFromQtMapId(tileSpec().mapId()));
+        _pendingBaseImage.clear();
+        return;
+    }
+
+    QNetworkRequest overlayRequest = QGeoTileFetcherQGC::getNetworkRequest(
+        tileSpec().mapId(), tileSpec().x(), tileSpec().y(), tileSpec().zoom());
+    // getNetworkRequest builds the base URL; replace with overlay URL.
+    overlayRequest.setUrl(overlayUrl);
+    overlayRequest.setOriginatingObject(this);
+
+    _fetchingOverlay = true;
+    _networkReply = _networkManager->get(overlayRequest);
+    if (!_networkReply) {
+        _fetchingOverlay = false;
+        _finishWithImage(_pendingBaseImage, UrlFactory::getProviderTypeFromQtMapId(tileSpec().mapId()));
+        _pendingBaseImage.clear();
+        return;
+    }
+
+    QNetworkReply* const reply = _networkReply.data();
+    QGCNetworkHelper::ignoreSslErrorsIfNeeded(reply);
+    (void) connect(reply, &QNetworkReply::finished, this, &QGeoTiledMapReplyQGC::_networkReplyFinished);
+    (void) connect(reply, &QNetworkReply::errorOccurred, this, &QGeoTiledMapReplyQGC::_networkReplyError);
+    (void) connect(reply, &QNetworkReply::sslErrors, this, &QGeoTiledMapReplyQGC::_networkReplySslErrors);
+    (void) connect(this, &QGeoTiledMapReplyQGC::aborted, reply, &QNetworkReply::abort);
+}
+
 void QGeoTiledMapReplyQGC::_networkReplyFinished()
 {
     QNetworkReply* const reply = qobject_cast<QNetworkReply*>(sender());
@@ -105,6 +183,12 @@ void QGeoTiledMapReplyQGC::_networkReplyFinished()
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
+        if (_fetchingOverlay && !_pendingBaseImage.isEmpty()) {
+            // Overlay failed: still show satellite base rather than failing the tile.
+            _fetchingOverlay = false;
+            _finishWithImage(_pendingBaseImage, UrlFactory::getProviderTypeFromQtMapId(tileSpec().mapId()));
+            _pendingBaseImage.clear();
+        }
         return;
     }
 
@@ -115,6 +199,12 @@ void QGeoTiledMapReplyQGC::_networkReplyFinished()
 
     const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (!QGCNetworkHelper::isHttpSuccess(statusCode)) {
+        if (_fetchingOverlay && !_pendingBaseImage.isEmpty()) {
+            _fetchingOverlay = false;
+            _finishWithImage(_pendingBaseImage, UrlFactory::getProviderTypeFromQtMapId(tileSpec().mapId()));
+            _pendingBaseImage.clear();
+            return;
+        }
         setError(QGeoTiledMapReply::CommunicationError, reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString());
         return;
     }
@@ -131,6 +221,14 @@ void QGeoTiledMapReplyQGC::_networkReplyFinished()
         return;
     }
 
+    if (_fetchingOverlay) {
+        _fetchingOverlay = false;
+        const QByteArray composited = _compositeOverlay(_pendingBaseImage, image);
+        _pendingBaseImage.clear();
+        _finishWithImage(composited, mapProvider->getMapName());
+        return;
+    }
+
     if (mapProvider->isBingProvider() && (image == _bingNoTileImage)) {
         setError(QGeoTiledMapReply::CommunicationError, tr("Bing Tile Above Zoom Level"));
         return;
@@ -144,23 +242,26 @@ void QGeoTiledMapReplyQGC::_networkReplyFinished()
             return;
         }
     }
-    setMapImageData(image);
 
-    const QString format = mapProvider->getImageFormat(image);
-    if (format.isEmpty()) {
-        setError(QGeoTiledMapReply::ParseError, tr("Unknown Format"));
+    const QUrl overlayUrl = mapProvider->getOverlayTileURL(tileSpec().x(), tileSpec().y(), tileSpec().zoom());
+    if (overlayUrl.isValid()) {
+        _pendingBaseImage = image;
+        _startOverlayFetch(overlayUrl);
         return;
     }
-    setMapImageFormat(format);
 
-    QGeoFileTileCacheQGC::cacheTile(mapProvider->getMapName(), tileSpec().x(), tileSpec().y(), tileSpec().zoom(), image, format);
-
-    setFinished(true);
+    _finishWithImage(image, mapProvider->getMapName());
 }
 
 void QGeoTiledMapReplyQGC::_networkReplyError(QNetworkReply::NetworkError error)
 {
     if (error != QNetworkReply::OperationCanceledError) {
+        if (_fetchingOverlay && !_pendingBaseImage.isEmpty()) {
+            _fetchingOverlay = false;
+            _finishWithImage(_pendingBaseImage, UrlFactory::getProviderTypeFromQtMapId(tileSpec().mapId()));
+            _pendingBaseImage.clear();
+            return;
+        }
         const QNetworkReply* const reply = qobject_cast<const QNetworkReply*>(sender());
         if (!reply) {
             setError(QGeoTiledMapReply::CommunicationError, tr("Invalid Reply"));

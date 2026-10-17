@@ -8,6 +8,7 @@
 #include "BingMapProvider.h"
 #include "ElevationMapProvider.h"
 #include "EsriMapProvider.h"
+#include "GaodeMapProvider.h"
 #include "GenericMapProvider.h"
 #include "GoogleMapProvider.h"
 #include "MapboxMapProvider.h"
@@ -30,6 +31,12 @@ const QList<SharedMapProvider> UrlFactory::_providers = {
 
     std::make_shared<TianDiTuRoadProvider>(),
     std::make_shared<TianDiTuSatelliteProvider>(),
+
+    // Gaode (Amap) — default for G20 / CN ops; Hybrid composites sat + roads.
+    std::make_shared<GaodeRoadMapProvider>(),
+    std::make_shared<GaodeSatelliteMapProvider>(),
+    std::make_shared<GaodeHybridMapProvider>(),
+
     std::make_shared<StatkartTopoMapProvider>(),
     std::make_shared<StatkartBaseMapProvider>(),
     std::make_shared<SvalbardMapProvider>(),

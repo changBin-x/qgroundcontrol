@@ -13,6 +13,8 @@ qt_add_plugin(QGCLocation
     Providers/ElevationMapProvider.h
     Providers/EsriMapProvider.cpp
     Providers/EsriMapProvider.h
+    Providers/GaodeMapProvider.cpp
+    Providers/GaodeMapProvider.h
     Providers/GenericMapProvider.cpp
     Providers/GenericMapProvider.h
     Providers/GoogleMapProvider.cpp
@@ -62,6 +64,7 @@ endif()
 
 target_link_libraries(QGCLocation
     PRIVATE
+        Qt6::Gui
         Qt6::Positioning
         QGCCompression
         QGCDatabase

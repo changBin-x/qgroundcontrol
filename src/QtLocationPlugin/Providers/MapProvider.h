@@ -37,6 +37,10 @@ public:
 
     QUrl getTileURL(int x, int y, int zoom) const;
 
+    /// Optional transparent overlay tile (e.g. Gaode road labels on satellite).
+    /// Empty URL means no overlay; reply path composites when present.
+    virtual QUrl getOverlayTileURL(int x, int y, int zoom) const;
+
     QString getImageFormat(QByteArrayView image) const;
 
     // TODO: Download Random Tile And Use That Size Instead?
