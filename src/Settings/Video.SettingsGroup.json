@@ -7,7 +7,7 @@
             "shortDesc": "Source for video stream (UDP, TCP, RTSP, or connected USB camera).",
             "longDesc": "Source for video. UDP, TCP, RTSP and UVC Cameras may be supported depending on Vehicle and ground station version.",
             "type": "string",
-            "default": "",
+            "default": "RTSP Video Stream",
             "label": "Source",
             "keywords": "video source,camera,stream"
         },
@@ -25,7 +25,7 @@
             "shortDesc": "Network address for RTSP video stream (e.g. rtsp://192.168.42.1:554/live).",
             "longDesc": "RTSP url address and port to bind to for video stream. Example: rtsp://192.168.42.1:554/live",
             "type": "string",
-            "default": "",
+            "default": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4",
             "label": "RTSP URL",
             "keywords": "rtsp,video url,stream url"
         },

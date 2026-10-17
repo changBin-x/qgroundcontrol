@@ -81,7 +81,9 @@ void VideoSettings::_setDefaults()
     if (_noVideo) {
         _nameToMetaDataMap[videoSourceName]->setRawDefaultValue(videoSourceNoVideo);
     } else {
-        _nameToMetaDataMap[videoSourceName]->setRawDefaultValue(videoDisabled);
+        // G20 / RovGroundControl: default to RTSP so the video pane is ready
+        // for shore-side camera URLs (JSON also ships a public test stream).
+        _nameToMetaDataMap[videoSourceName]->setRawDefaultValue(videoSourceRTSP);
     }
 }
 
