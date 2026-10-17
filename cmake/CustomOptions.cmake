@@ -17,26 +17,37 @@ set(QGC_CUSTOM_DIR
 # Application Metadata
 # ============================================================================
 
+# G20 / RovGroundControl branding (FORCE so reconfigure overrides stale cache).
+# QGC_APP_NAME must stay ASCII — it is the CMake project()/target name.
+# QGC_APP_DISPLAY_NAME is the Chinese launcher + in-app title.
 set(QGC_APP_NAME
-    "QGroundControl"
-    CACHE STRING "Application name"
+    "RovGroundControl"
+    CACHE STRING "Application name (CMake target / English brand)" FORCE
 )
+# Read UTF-8 title from file so Windows CMake does not mojibake Chinese in qgc_version.h
+file(READ "${CMAKE_SOURCE_DIR}/cmake/branding/app_display_name.txt" _qgc_display_name_raw)
+string(STRIP "${_qgc_display_name_raw}" _qgc_display_name_raw)
+set(QGC_APP_DISPLAY_NAME
+    "${_qgc_display_name_raw}"
+    CACHE STRING "User-visible application title" FORCE
+)
+unset(_qgc_display_name_raw)
 string(TIMESTAMP _copyright_year "%Y")
 set(QGC_APP_COPYRIGHT
-    "Copyright (c) ${_copyright_year} QGroundControl. All rights reserved."
-    CACHE STRING "Copyright notice"
+    "Copyright (c) ${_copyright_year} RovGroundControl. All rights reserved."
+    CACHE STRING "Copyright notice" FORCE
 )
 set(QGC_APP_DESCRIPTION
-    "Open Source Ground Control App"
-    CACHE STRING "Application description"
+    "RovGroundControl — underwater ROV shore-based control software"
+    CACHE STRING "Application description" FORCE
 )
 set(QGC_ORG_NAME
-    "QGroundControl"
-    CACHE STRING "Organization name"
+    "RovGroundControl"
+    CACHE STRING "Organization name" FORCE
 )
 set(QGC_ORG_DOMAIN
-    "qgroundcontrol.com"
-    CACHE STRING "Organization domain"
+    "rovgroundcontrol.local"
+    CACHE STRING "Organization domain" FORCE
 )
 set(QGC_PACKAGE_NAME
     "org.mavlink.qgroundcontrol"
@@ -44,9 +55,10 @@ set(QGC_PACKAGE_NAME
 )
 
 # Settings version - increment to clear stored settings on next boot after incompatible changes
+# v10: default map → Gaode Hybrid; default video → RTSP test stream
 set(QGC_SETTINGS_VERSION
-    "9"
-    CACHE STRING "Settings schema version"
+    "10"
+    CACHE STRING "Settings schema version" FORCE
 )
 
 # ============================================================================
