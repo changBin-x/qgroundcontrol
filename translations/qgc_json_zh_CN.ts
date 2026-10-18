@@ -6776,7 +6776,7 @@
       <extracomment>.QGC.MetaData.Facts[preferredFirmwareClass].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Preferred Firmware</source>
-      <translation type="unfinished">Preferred Firmware</translation>
+      <translation>首选固件</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[preferredFirmwareClass].keywords</extracomment>
@@ -6808,7 +6808,7 @@
       <extracomment>.QGC.MetaData.Facts[preferredVehicleClass].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Preferred Vehicle</source>
-      <translation type="unfinished">Preferred Vehicle</translation>
+      <translation>首选载具</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[preferredVehicleClass].keywords</extracomment>
@@ -6895,7 +6895,7 @@
       <extracomment>.QGC.MetaData.Facts[batteryPercentRemainingAnnounce].shortDesc, .QGC.MetaData.Facts[batteryPercentRemainingAnnounce].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Announce battery remaining percent</source>
-      <translation type="unfinished">Announce battery remaining percent</translation>
+      <translation>播报剩余电量百分比</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[batteryPercentRemainingAnnounce].longDesc</extracomment>
@@ -6919,7 +6919,7 @@
       <extracomment>.QGC.MetaData.Facts[defaultMissionItemAltitude].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Default Mission Altitude</source>
-      <translation type="unfinished">Default Mission Altitude</translation>
+      <translation>默认任务高度</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[defaultMissionItemAltitude].keywords</extracomment>
@@ -6938,13 +6938,13 @@
       <extracomment>.QGC.MetaData.Facts[audioMuted].longDesc</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Mutes all audio output without changing the volume level.</source>
-      <translation type="unfinished">Mutes all audio output without changing the volume level.</translation>
+      <translation>静音所有音频输出，不改变音量设置。</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[audioMuted].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Mute Audio Output</source>
-      <translation type="unfinished">Mute Audio Output</translation>
+      <translation>静音音频输出</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[audioMuted].keywords</extracomment>
@@ -6957,19 +6957,19 @@
       <extracomment>.QGC.MetaData.Facts[audioVolume].shortDesc</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Controls the volume level for audio alerts and notifications.</source>
-      <translation type="unfinished">Controls the volume level for audio alerts and notifications.</translation>
+      <translation>控制音频告警与通知的音量。</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[audioVolume].longDesc</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Sets the audio output volume percentage.</source>
-      <translation type="unfinished">Sets the audio output volume percentage.</translation>
+      <translation>设置音频输出音量百分比。</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[audioVolume].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Audio Output Volume</source>
-      <translation type="unfinished">Audio Output Volume</translation>
+      <translation>音频输出音量</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[audioVolume].keywords</extracomment>
@@ -6994,7 +6994,7 @@
       <extracomment>.QGC.MetaData.Facts[virtualJoystick].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Virtual Joystick</source>
-      <translation type="unfinished">Virtual Joystick</translation>
+      <translation>虚拟摇杆</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[virtualJoystick].keywords</extracomment>
@@ -7019,7 +7019,7 @@
       <extracomment>.QGC.MetaData.Facts[virtualJoystickAutoCenterThrottle].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Auto-Center Throttle</source>
-      <translation type="unfinished">Auto-Center Throttle</translation>
+      <translation>油门自动回中</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[virtualJoystickAutoCenterThrottle].keywords</extracomment>
@@ -7044,7 +7044,7 @@
       <extracomment>.QGC.MetaData.Facts[virtualJoystickLeftHandedMode].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Left-Handed Mode</source>
-      <translation type="unfinished">Left-Handed Mode</translation>
+      <translation>左手模式</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[virtualJoystickLeftHandedMode].keywords</extracomment>
@@ -7076,7 +7076,7 @@
       <extracomment>.QGC.MetaData.Facts[gstDebugLevel].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>GStreamer debug level</source>
-      <translation type="unfinished">GStreamer debug level</translation>
+      <translation>GStreamer 调试级别</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[gstDebugLevel].keywords</extracomment>
@@ -7101,7 +7101,7 @@
       <extracomment>.QGC.MetaData.Facts[useChecklist].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Use Preflight Checklist</source>
-      <translation type="unfinished">Use Preflight Checklist</translation>
+      <translation>使用起飞前检查单</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[useChecklist].keywords, .QGC.MetaData.Facts[enforceChecklist].keywords</extracomment>
@@ -7126,7 +7126,7 @@
       <extracomment>.QGC.MetaData.Facts[enforceChecklist].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Enforce Preflight Checklist</source>
-      <translation type="unfinished">Enforce Preflight Checklist</translation>
+      <translation>强制起飞前检查单</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[enableMultiVehiclePanel].shortDesc</extracomment>
@@ -7144,7 +7144,7 @@
       <extracomment>.QGC.MetaData.Facts[enableMultiVehiclePanel].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Enable Multi-Vehicle Panel</source>
-      <translation type="unfinished">Enable Multi-Vehicle Panel</translation>
+      <translation>启用多载具面板</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[enableMultiVehiclePanel].keywords</extracomment>
@@ -7169,7 +7169,7 @@
       <extracomment>.QGC.MetaData.Facts[uiScalePercent].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>UI Scaling</source>
-      <translation type="unfinished">UI Scaling</translation>
+      <translation>界面缩放</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[uiScalePercent].keywords</extracomment>
@@ -7182,13 +7182,13 @@
       <extracomment>.QGC.MetaData.Facts[indoorPalette].shortDesc</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Switches between light and dark color schemes for different lighting conditions.</source>
-      <translation type="unfinished">Switches between light and dark color schemes for different lighting conditions.</translation>
+      <translation>在不同光照条件下切换浅色/深色界面配色。</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[indoorPalette].longDesc</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>The color scheme for the user interface.</source>
-      <translation type="unfinished">The color scheme for the user interface.</translation>
+      <translation>用户界面的配色方案。</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[indoorPalette].enumStrings</extracomment>
@@ -7201,14 +7201,14 @@
       <extracomment>.QGC.MetaData.Facts[indoorPalette].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Color Scheme</source>
-      <translation type="unfinished">Color Scheme</translation>
+      <translation>配色方案</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[indoorPalette].keywords</extracomment>
       <translatorcomment>Only use english comma ',' to separate strings</translatorcomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>palette,dark mode,theme,color scheme</source>
-      <translation type="unfinished">palette,dark mode,theme,color scheme</translation>
+      <translation>调色板,深色模式,主题,配色方案</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[savePath].shortDesc</extracomment>
@@ -7226,7 +7226,7 @@
       <extracomment>.QGC.MetaData.Facts[savePath].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Application Load/Save Path</source>
-      <translation type="unfinished">Application Load/Save Path</translation>
+      <translation>应用加载/保存路径</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[savePath].keywords</extracomment>
@@ -7239,7 +7239,7 @@
       <extracomment>.QGC.MetaData.Facts[androidDontSaveToSDCard].shortDesc, .QGC.MetaData.Facts[androidDontSaveToSDCard].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Don't save to SD card, even if available</source>
-      <translation type="unfinished">Don't save to SD card, even if available</translation>
+      <translation>即使有 SD 卡也不保存到其上</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[androidDontSaveToSDCard].longDesc</extracomment>
@@ -7458,7 +7458,7 @@
       <extracomment>.QGC.MetaData.Facts[followTarget].shortDesc</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Streams the ground station GPS location to the vehicle for Follow Me mode.</source>
-      <translation type="unfinished">Streams the ground station GPS location to the vehicle for Follow Me mode.</translation>
+      <translation>将地面站 GPS 位置发送给载具，用于“跟随我”模式。</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[followTarget].enumStrings</extracomment>
@@ -7471,26 +7471,26 @@
       <extracomment>.QGC.MetaData.Facts[followTarget].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Stream GCS Position</source>
-      <translation type="unfinished">Stream GCS Position</translation>
+      <translation>发送地面站位置</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[followTarget].keywords</extracomment>
       <translatorcomment>Only use english comma ',' to separate strings</translatorcomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>follow me</source>
-      <translation type="unfinished">follow me</translation>
+      <translation>跟随我</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[qLocaleLanguage].shortDesc</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Determines the language used for the application interface. Requires restart.</source>
-      <translation type="unfinished">Determines the language used for the application interface. Requires restart.</translation>
+      <translation>决定应用程序界面使用的语言。更改后需要重启。</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[qLocaleLanguage].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>语言</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[qLocaleLanguage].keywords</extracomment>
@@ -7515,7 +7515,7 @@
       <extracomment>.QGC.MetaData.Facts[clearSettingsNextBoot].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Clear all settings on next start</source>
-      <translation type="unfinished">Clear all settings on next start</translation>
+      <translation>下次启动时清除全部设置</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[clearSettingsNextBoot].keywords</extracomment>
@@ -7528,7 +7528,7 @@
       <extracomment>.QGC.MetaData.Facts[disableAllPersistence].shortDesc, .QGC.MetaData.Facts[disableAllPersistence].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Disable all data persistence</source>
-      <translation type="unfinished">Disable all data persistence</translation>
+      <translation>禁用所有数据持久化</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[disableAllPersistence].longDesc</extracomment>
@@ -7564,7 +7564,7 @@
       <extracomment>.QGC.MetaData.Facts[showAppLogTimestampAsElapsedTime].label</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>Elapsed Timestamps</source>
-      <translation type="unfinished">Elapsed Timestamps</translation>
+      <translation>相对时间戳</translation>
     </message>
     <message>
       <extracomment>.QGC.MetaData.Facts[showAppLogTimestampAsElapsedTime].keywords</extracomment>
@@ -7572,6 +7572,46 @@
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/Settings/App.SettingsGroup.json"/>
       <source>log,time,elapsed,timestamp,console</source>
       <translation type="unfinished">log,time,elapsed,timestamp,console</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>Mute voice notifications</source>
+      <translation>静音语音通知</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>Mutes voice notifications without changing the volume level.</source>
+      <translation>静音语音通知，不改变音量设置。</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>Mute Voice Notifications</source>
+      <translation>静音语音通知</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>Controls the volume level for voice notifications.</source>
+      <translation>控制语音通知的音量。</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>Sets the voice notification volume percentage.</source>
+      <translation>设置语音通知音量百分比。</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>Voice Notification Volume</source>
+      <translation>语音通知音量</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>audio,mute,sound,voice,notifications</source>
+      <translation>音频,静音,声音,语音,通知</translation>
+    </message>
+    <message>
+      <location filename="../src/Settings/App.SettingsGroup.json"/>
+      <source>audio,volume,sound,voice,notifications</source>
+      <translation>音频,音量,声音,语音,通知</translation>
     </message>
   </context>
   <context>
@@ -9299,7 +9339,7 @@
       <extracomment>.groups[General].heading</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/FlyView.SettingsUI.json"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>常规</translation>
     </message>
     <message>
       <extracomment>.groups[General].keywords[0]</extracomment>
@@ -9437,7 +9477,7 @@
       <extracomment>.groups[Virtual Joystick].heading</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/FlyView.SettingsUI.json"/>
       <source>Virtual Joystick</source>
-      <translation type="unfinished">Virtual Joystick</translation>
+      <translation>虚拟摇杆</translation>
     </message>
     <message>
       <extracomment>.groups[Virtual Joystick].keywords[0]</extracomment>
@@ -10055,110 +10095,122 @@
       <extracomment>.pages[General].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>常规</translation>
     </message>
     <message>
       <extracomment>.pages[Fly View].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Fly View</source>
-      <translation type="unfinished">Fly View</translation>
+      <translation>飞行视图</translation>
     </message>
     <message>
       <extracomment>.pages[3D View].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>3D View</source>
-      <translation type="unfinished">3D View</translation>
+      <translation>三维视图</translation>
     </message>
     <message>
       <extracomment>.pages[Plan View].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Plan View</source>
-      <translation type="unfinished">Plan View</translation>
+      <translation>计划视图</translation>
     </message>
     <message>
       <extracomment>.pages[ADSB Server].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>ADSB Server</source>
-      <translation type="unfinished">ADSB Server</translation>
+      <translation>ADSB 服务器</translation>
     </message>
     <message>
       <extracomment>.pages[Comm Links].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Comm Links</source>
-      <translation type="unfinished">Comm Links</translation>
+      <translation>通信链路</translation>
     </message>
     <message>
       <extracomment>.pages[App Logging].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>App Logging</source>
-      <translation type="unfinished">App Logging</translation>
+      <translation>应用日志记录</translation>
     </message>
     <message>
       <extracomment>.pages[App Log Viewer].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>App Log Viewer</source>
-      <translation type="unfinished">App Log Viewer</translation>
+      <translation>应用日志查看器</translation>
     </message>
     <message>
       <extracomment>.pages[Maps].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Maps</source>
-      <translation type="unfinished">Maps</translation>
+      <translation>地图</translation>
     </message>
     <message>
       <extracomment>.pages[NTRIP/RTK].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>NTRIP/RTK</source>
-      <translation type="unfinished">NTRIP/RTK</translation>
+      <translation>NTRIP/RTK</translation>
     </message>
     <message>
       <extracomment>.pages[PX4 Log Transfer].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>PX4 Log Transfer</source>
-      <translation type="unfinished">PX4 Log Transfer</translation>
+      <translation>PX4 日志传输</translation>
     </message>
     <message>
       <extracomment>.pages[Remote ID].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Remote ID</source>
-      <translation type="unfinished">Remote ID</translation>
+      <translation>Remote ID</translation>
     </message>
     <message>
       <extracomment>.pages[Telemetry].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Telemetry</source>
-      <translation type="unfinished">Telemetry</translation>
+      <translation>遥测</translation>
     </message>
     <message>
       <extracomment>.pages[Video].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>视频</translation>
     </message>
     <message>
       <extracomment>.pages[Help].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>帮助</translation>
     </message>
     <message>
       <extracomment>.pages[Mock Link].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Mock Link</source>
-      <translation type="unfinished">Mock Link</translation>
+      <translation>模拟链路</translation>
     </message>
     <message>
       <extracomment>.pages[Debug].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>调试</translation>
     </message>
     <message>
       <extracomment>.pages[Palette Test].name</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
       <source>Palette Test</source>
-      <translation type="unfinished">Palette Test</translation>
+      <translation>调色板测试</translation>
+    </message>    <message>
+      <extracomment>.pages[GNSS Receiver].name</extracomment>
+      <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
+      <source>GNSS Receiver</source>
+      <translation>GNSS 接收机</translation>
     </message>
+    <message>
+      <extracomment>.pages[RTK Corrections].name</extracomment>
+      <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/SettingsPages.json"/>
+      <source>RTK Corrections</source>
+      <translation>RTK 改正数</translation>
+    </message>
+
   </context>
   <context>
     <name>Viewer3D.SettingsUI.json</name>
@@ -11171,7 +11223,7 @@
       <extracomment>.groups[General].heading</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/General.SettingsUI.json"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>常规</translation>
     </message>
     <message>
       <extracomment>.groups[General].keywords[0]</extracomment>
@@ -11213,7 +11265,7 @@
       <extracomment>.groups[General].keywords[6]</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/General.SettingsUI.json"/>
       <source>follow me</source>
-      <translation type="unfinished">follow me</translation>
+      <translation>跟随我</translation>
     </message>
     <message>
       <extracomment>.groups[General].keywords[7]</extracomment>
@@ -11297,7 +11349,7 @@
       <extracomment>.groups[General].controls[3].button.text</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/General.SettingsUI.json"/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>测试</translation>
     </message>
     <message>
       <extracomment>.groups[Vehicle Preferences].heading</extracomment>
@@ -11426,7 +11478,7 @@
       <extracomment>.groups[General].heading</extracomment>
       <location filename="/home/runner/work/qgroundcontrol/qgroundcontrol/src/AppSettings/pages/PlanView.SettingsUI.json"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>常规</translation>
     </message>
     <message>
       <extracomment>.groups[General].keywords[0]</extracomment>
