@@ -53,3 +53,8 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+# Optional RCSDK/H12/FishSemi deps not shipped in G20 AAR set — ignore for R8
+-dontwarn com.fishsemi.sdk.**
+-dontwarn com.skydroid.fpvplayer.**
+-dontwarn org.apache.commons.net.**
