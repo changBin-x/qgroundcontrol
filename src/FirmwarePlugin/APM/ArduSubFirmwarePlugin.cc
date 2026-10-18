@@ -1,8 +1,11 @@
 #include "ArduSubFirmwarePlugin.h"
 
+#include "FactMetaData.h"
 #include "MAVLinkLib.h"
 #include "QGCLoggingCategory.h"
 #include "Vehicle.h"
+
+#include <QtCore/QHash>
 
 QGC_LOGGING_CATEGORY(APMSubmarineFactGroupLog, "FirmwarePlugin.ArduSubFirmwarePlugin")
 
@@ -53,6 +56,44 @@ void ArduSubFirmwarePlugin::adjustMetaData(MAV_TYPE vehicleType, FactMetaData *m
     if (_factRenameMap.contains(metaData->name())) {
         metaData->setShortDescription(QString(_factRenameMap[metaData->name()]));
     }
+
+    // FLTMODE1..6 enum labels come from ArduPilot parameter metadata (English).
+    // Remap display strings to the same localized flight-mode names used by the
+    // toolbar mode list so Vehicle Setup → Flight Modes matches the UI language.
+    const QString paramName = metaData->name();
+    if (paramName.startsWith(QStringLiteral("FLTMODE")) && paramName != QStringLiteral("FLTMODE_CH")) {
+        const QStringList enumStrings = metaData->enumStrings();
+        const QVariantList enumValues = metaData->enumValues();
+        if (!enumStrings.isEmpty() && enumStrings.size() == enumValues.size()) {
+            const QHash<QString, QString> engToLocalized{
+                {QStringLiteral("Manual"), _manualFlightMode},
+                {QStringLiteral("Stabilize"), _stabilizeFlightMode},
+                {QStringLiteral("Acro"), _acroFlightMode},
+                {QStringLiteral("Depth Hold"), _altHoldFlightMode},
+                {QStringLiteral("Alt Hold"), _altHoldFlightMode},
+                {QStringLiteral("Auto"), _autoFlightMode},
+                {QStringLiteral("Guided"), _guidedFlightMode},
+                {QStringLiteral("Circle"), _circleFlightMode},
+                {QStringLiteral("Surface"), _surfaceFlightMode},
+                {QStringLiteral("PosHold"), _posHoldFlightMode},
+                {QStringLiteral("Position Hold"), _posHoldFlightMode},
+                {QStringLiteral("Motor Detection"), _motorDetectionFlightMode},
+                {QStringLiteral("Surftrak"), _surftrakFlightMode},
+            };
+            QStringList localized = enumStrings;
+            bool changed = false;
+            for (QString &label : localized) {
+                const auto it = engToLocalized.constFind(label);
+                if (it != engToLocalized.cend()) {
+                    label = it.value();
+                    changed = true;
+                }
+            }
+            if (changed) {
+                metaData->setEnumInfo(localized, enumValues);
+            }
+        }
+    }
 }
 
 QString ArduSubFirmwarePlugin::stabilizedFlightMode() const
@@ -67,9 +108,30 @@ QString ArduSubFirmwarePlugin::motorDetectionFlightMode() const
 
 void ArduSubFirmwarePlugin::updateAvailableFlightModes(FlightModeList &modeList)
 {
-    for (FirmwareFlightMode &mode: modeList) {
+    // AVAILABLE_MODES from the vehicle ships English mode_name strings. Remap
+    // by custom_mode to the same tr()-localized names used by the ctor list and
+    // FLTMODE metadata so the toolbar and mode picker stay in the UI language.
+    const QHash<uint32_t, QString> customToLocalized{
+        {static_cast<uint32_t>(APMSubMode::MANUAL), _manualFlightMode},
+        {static_cast<uint32_t>(APMSubMode::STABILIZE), _stabilizeFlightMode},
+        {static_cast<uint32_t>(APMSubMode::ACRO), _acroFlightMode},
+        {static_cast<uint32_t>(APMSubMode::ALT_HOLD), _altHoldFlightMode},
+        {static_cast<uint32_t>(APMSubMode::AUTO), _autoFlightMode},
+        {static_cast<uint32_t>(APMSubMode::GUIDED), _guidedFlightMode},
+        {static_cast<uint32_t>(APMSubMode::CIRCLE), _circleFlightMode},
+        {static_cast<uint32_t>(APMSubMode::SURFACE), _surfaceFlightMode},
+        {static_cast<uint32_t>(APMSubMode::POSHOLD), _posHoldFlightMode},
+        {static_cast<uint32_t>(APMSubMode::MOTORDETECTION), _motorDetectionFlightMode},
+        {static_cast<uint32_t>(APMSubMode::SURFTRAK), _surftrakFlightMode},
+    };
+
+    for (FirmwareFlightMode &mode : modeList) {
         mode.fixedWing = false;
         mode.multiRotor = true;
+        const auto it = customToLocalized.constFind(mode.custom_mode);
+        if (it != customToLocalized.cend()) {
+            mode.mode_name = it.value();
+        }
     }
 
     _updateFlightModeList(modeList);
