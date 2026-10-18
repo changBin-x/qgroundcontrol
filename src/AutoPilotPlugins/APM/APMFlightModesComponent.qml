@@ -12,7 +12,7 @@ SetupPage {
 
     readonly property string _modeChannelParam: controller.modeChannelParam
     readonly property string _modeParamPrefix:  controller.modeParamPrefix
-    readonly property var    _pwmStrings:       [ "PWM 0 - 1230", "PWM 1231 - 1360", "PWM 1361 - 1490", "PWM 1491 - 1620", "PWM 1621 - 1749", "PWM 1750 +"]
+    readonly property var    _pwmStrings:       [ qsTr("PWM 0 - 1230"), qsTr("PWM 1231 - 1360"), qsTr("PWM 1361 - 1490"), qsTr("PWM 1491 - 1620"), qsTr("PWM 1621 - 1749"), qsTr("PWM 1750 +")]
 
     property real   _margins:                   ScreenTools.defaultFontPixelHeight
     property real   _comboWidth:                ScreenTools.defaultFontPixelWidth * 30
